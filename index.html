@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)} html,body{margin:0} [hidden]{display:none!important}</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)} html,body{margin:0}</style>
 <title>Солодкий ряд</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,6 +27,7 @@
   color-scheme: light;
 }
 html,body{height:100%}
+[hidden]{display:none !important}
 body{
   margin:0; overflow:hidden; overscroll-behavior:none;
   background:radial-gradient(var(--milk-dot) 1.6px, transparent 2.1px) 0 0/20px 20px, var(--milk);
@@ -141,7 +142,7 @@ h1{
 .scoreline{display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:13px; padding:0 4px}
 .scoreline b{color:var(--cocoa); font-weight:900; font-variant-numeric:tabular-nums}
 .boardwrap{flex:1; min-height:0; min-width:0; display:flex; align-items:center; justify-content:center}
-#cv{display:block; touch-action:none; border-radius:18px; box-shadow:0 6px 0 #2A1718, 0 14px 30px rgba(59,34,36,.25); max-width:100%}
+#cv{display:block; touch-action:none; max-width:100%}
 
 @media (min-width:720px) and (min-aspect-ratio:5/4){
   #game{flex-direction:row; gap:28px; align-items:stretch}
@@ -507,7 +508,6 @@ function sprinkle(g, R, list) {
 function drawPiece(g, t, sp, cx, cy, S) {
   const R = S * .4;
   g.save(); g.translate(cx, cy); g.lineCap = 'round'; g.lineJoin = 'round';
-  g.fillStyle = 'rgba(20,6,8,.28)'; ell(g, 0, R * .9, R * .72, R * .16);
   switch (t) {
     case 0: { // макарун
       const main = '#F48FB1', dark = '#D2457F';
@@ -608,11 +608,34 @@ function drawGlazeIcon(g, cx, cy, S) {
   circ(g, cx - w * .2, cy + w * .08, S * .07); circ(g, cx + w * .15, cy + w * .14, S * .09);
 }
 
+/* Paints a piece with volume: body, then light & shade laid "atop" its own pixels, then a soft drop shadow. */
+function renderPiece(g, t, sp, cx, cy, S) {
+  const sz = Math.ceil(S * 1.1), c = document.createElement('canvas'); c.width = c.height = sz;
+  const h = c.getContext('2d'), m = sz / 2, R = S * .4;
+  drawPiece(h, t, sp, m, m, S);
+  h.globalCompositeOperation = 'source-atop';
+  let gr = h.createRadialGradient(m - R * .35, m - R * .45, R * .05, m, m, R * 1.3);
+  gr.addColorStop(0, 'rgba(255,255,255,.5)'); gr.addColorStop(.3, 'rgba(255,255,255,.12)'); gr.addColorStop(.6, 'rgba(255,255,255,0)');
+  gr.addColorStop(.82, 'rgba(60,0,25,.16)'); gr.addColorStop(1, 'rgba(40,0,18,.45)');
+  h.fillStyle = gr; h.fillRect(0, 0, sz, sz);
+  gr = h.createLinearGradient(0, m + R * .45, 0, m + R);
+  gr.addColorStop(0, 'rgba(255,240,245,0)'); gr.addColorStop(1, 'rgba(255,240,245,.22)');
+  h.fillStyle = gr; h.fillRect(0, 0, sz, sz);
+  gr = h.createRadialGradient(m - R * .36, m - R * .52, 0, m - R * .36, m - R * .52, R * .34);
+  gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(.45, 'rgba(255,255,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  h.fillStyle = gr; h.fillRect(0, 0, sz, sz);
+  h.globalCompositeOperation = 'source-over';
+  g.save();
+  g.shadowColor = 'rgba(25,6,10,.5)'; g.shadowBlur = S * .08; g.shadowOffsetY = S * .055;
+  g.drawImage(c, cx - m, cy - m);
+  g.restore();
+}
 function iconCanvas(t, css = 30) {
   const c = document.createElement('canvas'), d = Math.min(3, window.devicePixelRatio || 1);
   c.width = c.height = Math.round(css * d); c.style.width = c.style.height = css + 'px';
-  const g = c.getContext('2d'); g.scale(d, d);
-  if (t === 'g') drawGlazeIcon(g, css / 2, css / 2, css); else drawPiece(g, +t, null, css / 2, css / 2 - css * .02, css * 1.12);
+  const g = c.getContext('2d');
+  if (t === 'g') { g.scale(d, d); drawGlazeIcon(g, css / 2, css / 2, css); }
+  else renderPiece(g, +t, null, c.width / 2, c.height / 2 - c.width * .04, c.width * 1.02);
   return c;
 }
 
@@ -627,14 +650,14 @@ function resize() {
   S = size; dpr = nd;
   cv.style.width = cv.style.height = S + 'px'; cv.width = cv.height = Math.round(S * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  pad = Math.round(S * .028); cs = (S - 2 * pad) / N; sprites.clear();
+  pad = Math.round(S * .028); cs = (S - 2 * pad) / N; sprites.clear(); boardBg = null;
 }
 new ResizeObserver(resize).observe(wrap);
 function sprite(t, sp) {
   const key = t + '|' + sp; let c = sprites.get(key);
   if (!c) {
-    const size = Math.ceil(cs * dpr); c = document.createElement('canvas'); c.width = c.height = size;
-    drawPiece(c.getContext('2d'), t, sp, size / 2, size / 2, size); sprites.set(key, c);
+    const size = Math.ceil(cs * dpr * 1.25); c = document.createElement('canvas'); c.width = c.height = size;
+    renderPiece(c.getContext('2d'), t, sp, size / 2, size / 2, cs * dpr); sprites.set(key, c);
   }
   return c;
 }
@@ -649,9 +672,27 @@ const PATTERNS = [
   (r, c) => (r === 1 || r === 6 || c === 1 || c === 6) && r >= 1 && r <= 6 && c >= 1 && c <= 6,
   (r, c) => c === 3 || c === 4,
 ];
+const SHAPES = [
+  ['.##..##.', '########', '########', '########', '.######.', '.######.', '..####..', '...##...'], // heart
+  ['..####..', '.######.', '########', '########', '########', '########', '.######.', '..####..'], // round cake
+  ['..####..', '.######.', '###..###', '##....##', '##....##', '###..###', '.######.', '..####..'], // doughnut
+  ['..####..', '..####..', '########', '########', '########', '########', '..####..', '..####..'], // cross
+  ['########', '########', '.######.', '..####..', '..####..', '.######.', '########', '########'], // hourglass
+  ['###..###', '###..###', '###..###', '########', '########', '###..###', '###..###', '###..###'], // two towers
+  ['#####...', '######..', '#######.', '########', '########', '.#######', '..######', '...#####'], // stairs
+  ['########', '########', '##.##.##', '########', '########', '##.##.##', '########', '########'], // islands
+  ['#..##..#', '##.##.##', '########', '########', '########', '########', '########', '########'], // crown
+  ['...##...', '..####..', '.######.', '########', '########', '.######.', '..####..', '...##...'], // diamond
+];
+const FULL = new Array(N * N).fill(true);
 function makeLevel(n) {
   const rng = mulberry32(n * 7919 + 13);
   const breather = n % 10 === 5;               // a gentle level in the middle of every chapter
+  // From level 6 on, roughly half of the trays get a shape; chapter openers and breathers stay square.
+  const shaped = n >= 6 && !breather && n % 10 !== 1 && rng() < .55;
+  const shapeIdx = shaped ? (n * 3 + Math.floor(rng() * 4)) % SHAPES.length : -1;
+  const mask = shaped ? SHAPES[shapeIdx].join('').split('').map(ch => ch === '#') : FULL;
+  const cells = mask.filter(Boolean).length;
   const types = (n <= 8 || n % 7 === 0 || breather) ? 5 : 6;
   const glazeOn = n >= 4 && n % 3 === 1;
   const layers = glazeOn && n >= 20 && n % 2 === 0 ? 2 : 1;
@@ -660,21 +701,21 @@ function makeLevel(n) {
   const moves = Math.max(18, 25 - Math.floor(n / 7)) + (glazeOn ? 3 + (layers - 1) * 4 : 0) + (kinds === 3 ? 2 : 0);
   const diff = (.5 + .4 * Math.min(1, (n - 1) / 90)) * (breather ? .8 : 1);
   const expected = moves * 5.2 / types;
-  const per = Math.max(8, Math.round(expected * diff * (pieceKinds === 3 ? .85 : 1) * (glazeOn ? .75 : 1)));
+  const per = Math.max(8, Math.round(expected * diff * (pieceKinds === 3 ? .85 : 1) * (glazeOn ? .75 : 1) * Math.sqrt(cells / 64)));
   const pool = shuffleArr([...Array(types).keys()], rng).slice(0, pieceKinds);
   const orders = pool.map(t => ({ t, need: per + Math.floor(rng() * 3) - 1 }));
   const glaze = new Array(N * N).fill(0);
   if (glazeOn) {
     const pat = PATTERNS[Math.floor(n / 3) % PATTERNS.length]; let sum = 0;
-    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (pat(r, c)) { glaze[r * N + c] = layers; sum += layers; }
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (pat(r, c) && mask[r * N + c]) { glaze[r * N + c] = layers; sum += layers; }
     orders.push({ t: 'g', need: sum });
   }
   const cust = (n - 1) % 15;
-  return { n, types, moves, time: moves * 5, orders, glaze, cust };
+  return { n, types, moves, time: moves * 5, orders: orders.filter(o => o.need > 0), glaze, cust, mask };
 }
 
 /* ---------- state ---------- */
-let L = null, B = [], G = [], moves = 0, used = 0, timeLeft = 0, mode = 'moves', score = 0, orders = [];
+let L = null, B = [], G = [], M = FULL, boardBg = null, moves = 0, used = 0, timeLeft = 0, mode = 'moves', score = 0, orders = [];
 let busy = false, playing = false, selected = -1, hint = null, lastAct = 0, extraUsed = false, uid = 1;
 let tools = { ...TOOLS }, spoonMode = false;
 const fx = { parts: [], beams: [], texts: [], shake: 0, flash: 0 };
@@ -768,10 +809,11 @@ function bestMove() {
 /* ---------- board setup ---------- */
 function fillBoard() {
   for (let tries = 0; tries < 300; tries++) {
-    B = new Array(N * N);
+    B = new Array(N * N).fill(null);
     for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
-      const i = r * N + c; let t, guard = 0;
-      do { t = rnd(L.types); } while (guard++ < 30 && ((c >= 2 && B[i - 1].t === t && B[i - 2].t === t) || (r >= 2 && B[i - N].t === t && B[i - 2 * N].t === t)));
+      const i = r * N + c; if (!M[i]) continue;
+      let t, guard = 0;
+      do { t = rnd(L.types); } while (guard++ < 30 && ((c >= 2 && B[i - 1]?.t === t && B[i - 2]?.t === t) || (r >= 2 && B[i - N]?.t === t && B[i - 2 * N]?.t === t)));
       B[i] = newPiece(t, null, r, c);
     }
     if (!findGroups().length && findMove()) break;
@@ -847,10 +889,12 @@ function animateFall(moving) {
 async function gravity() {
   const moving = [];
   for (let c = 0; c < N; c++) {
-    let w = N - 1;
-    for (let r = N - 1; r >= 0; r--) { const i = r * N + c, p = B[i]; if (!p) continue; if (r !== w) { B[w * N + c] = p; B[i] = null; moving.push({ p, from: p.dr }); p.r = w; } w--; }
-    const spawn = w + 1;
-    for (let r = w; r >= 0; r--) { const p = newPiece(rnd(L.types), null, r, c); p.dr = r - spawn - .3; B[r * N + c] = p; moving.push({ p, from: p.dr }); }
+    const slots = []; for (let r = N - 1; r >= 0; r--) if (M[r * N + c]) slots.push(r);   // playable rows, bottom up
+    if (!slots.length) continue;
+    let w = 0;
+    for (const r of slots) { const i = r * N + c, p = B[i]; if (!p) continue; const to = slots[w]; if (to !== r) { B[to * N + c] = p; B[i] = null; moving.push({ p, from: p.dr }); p.r = to; } w++; }
+    const top = slots[slots.length - 1];
+    for (let k = w; k < slots.length; k++) { const r = slots[k]; const p = newPiece(rnd(L.types), null, r, c); p.dr = top - 1 - (k - w) - .3; B[r * N + c] = p; moving.push({ p, from: p.dr }); }
   }
   await animateFall(moving);
 }
@@ -913,15 +957,16 @@ async function comboSpecials(a, b) {
 async function shuffleBoard() {
   floatText(T('fxShuffle'), 3.5, 3.2, true);
   await wait(400);
-  for (const p of B) { p.or = p.r; p.oc = p.c; }
+  const idx = [], all = [];
+  for (let i = 0; i < N * N; i++) if (B[i]) { idx.push(i); all.push(B[i]); B[i].or = B[i].r; B[i].oc = B[i].c; }
   let tries = 0;
   do {
-    const ps = shuffleArr(B.slice());
-    for (let i = 0; i < N * N; i++) { B[i] = ps[i]; ps[i].r = Math.floor(i / N); ps[i].c = i % N; }
-    if (++tries > 150) for (const p of B) if (!p.sp) p.t = rnd(L.types);
+    const ps = shuffleArr(all.slice());
+    idx.forEach((i, k) => { B[i] = ps[k]; ps[k].r = Math.floor(i / N); ps[k].c = i % N; });
+    if (++tries > 150) for (const p of all) if (!p.sp) p.t = rnd(L.types);
   } while ((findGroups().length || !findMove()) && tries < 400);
-  await tween(450 * SP, k => { const e = easeInOut(k); for (const p of B) { p.dr = p.or + (p.r - p.or) * e; p.dc = p.oc + (p.c - p.oc) * e; } });
-  for (const p of B) { p.dr = p.r; p.dc = p.c; }
+  await tween(450 * SP, k => { const e = easeInOut(k); for (const p of all) { p.dr = p.or + (p.r - p.or) * e; p.dc = p.oc + (p.c - p.oc) * e; } });
+  for (const p of all) { p.dr = p.r; p.dc = p.c; }
 }
 
 /* ---------- turn flow ---------- */
@@ -930,6 +975,7 @@ const ordersDone = () => orders.every(o => o.got >= o.need);
 
 async function trySwap(a, b) {
   if (busy || !playing) return;
+  if (!B[a] || !B[b]) return;
   busy = true; selected = -1; hint = null;
   try {
     const pa = B[a], pb = B[b];
@@ -1213,10 +1259,10 @@ function startLevel(n) {
   L = makeLevel(n); mode = save.mode;
   moves = L.moves; used = 0; timeLeft = L.time; tools = { ...TOOLS }; spoonMode = false; lastCounter = ''; score = 0; extraUsed = false; selected = -1; hint = null; playing = false; busy = false;
   orders = L.orders.map(o => ({ ...o, got: 0 }));
-  G = L.glaze.slice();
+  G = L.glaze.slice(); M = L.mask; boardBg = null;
   fx.parts.length = fx.beams.length = fx.texts.length = 0;
   fillBoard();
-  for (const p of B) { p.dr = p.r - N - 1; p.a = 1; }
+  for (const p of B) if (p) { p.dr = p.r - N - 1; p.a = 1; }
   $('#lvlNum').textContent = n;
   $('#orderNo').textContent = T('orderNo', { n: String(n).padStart(3, '0') });
   $('#who').textContent = D.customers[L.cust][0];
@@ -1225,7 +1271,7 @@ function startLevel(n) {
 }
 async function beginPlay() {
   busy = true;
-  await animateFall(B.map(p => ({ p, from: p.dr, delay: (N - 1 - p.r) * 25 + p.c * 12 })));
+  await animateFall(B.filter(Boolean).map(p => ({ p, from: p.dr, delay: (N - 1 - p.r) * 25 + p.c * 12 })));
   busy = false; playing = true; lastAct = performance.now(); updateHud();
 }
 
@@ -1259,7 +1305,7 @@ const adjacent = (a, b) => (Math.abs(a - b) === N) || (Math.abs(a - b) === 1 && 
 cv.addEventListener('pointerdown', e => {
   sfx.unlock();
   if (busy || !playing) return;
-  const cell = cellAt(e); if (cell < 0) return;
+  const cell = cellAt(e); if (cell < 0 || !M[cell]) return;
   if (spoonMode) { useSpoon(cell); return; }
   down = { cell, x: e.clientX, y: e.clientY, moved: false };
   try { cv.setPointerCapture(e.pointerId); } catch (_) {}
@@ -1274,7 +1320,7 @@ cv.addEventListener('pointermove', e => {
   const r = Math.floor(down.cell / N), c = down.cell % N;
   let tr = r, tc = c;
   if (Math.abs(dx) > Math.abs(dy)) tc += dx > 0 ? 1 : -1; else tr += dy > 0 ? 1 : -1;
-  if (tr >= 0 && tr < N && tc >= 0 && tc < N) trySwap(down.cell, tr * N + tc);
+  if (tr >= 0 && tr < N && tc >= 0 && tc < N && M[tr * N + tc]) trySwap(down.cell, tr * N + tc);
 });
 function endPointer() {
   if (down && !down.moved && !busy && playing) {
@@ -1288,6 +1334,30 @@ cv.addEventListener('pointerup', endPointer);
 cv.addEventListener('pointercancel', () => { down = null; });
 
 /* ---------- render ---------- */
+/* The chocolate tray follows the board's shape: a raised rim, then sunken cells. Cached until resize or a new level. */
+function drawTray() {
+  const c = document.createElement('canvas'); c.width = c.height = Math.round(S * dpr);
+  const g = c.getContext('2d'); g.scale(dpr, dpr);
+  const e = pad * .85, rad = cs * .3;
+  const blob = (dx, dy, grow) => { g.beginPath(); for (let i = 0; i < N * N; i++) if (M[i]) { const x = pad + (i % N) * cs, y = pad + Math.floor(i / N) * cs; g.roundRect ? g.roundRect(x - grow + dx, y - grow + dy, cs + grow * 2, cs + grow * 2, rad) : g.rect(x - grow + dx, y - grow + dy, cs + grow * 2, cs + grow * 2); } };
+  g.save(); g.shadowColor = 'rgba(59,34,36,.35)'; g.shadowBlur = 18; g.shadowOffsetY = 8;
+  g.fillStyle = '#2A1718'; blob(0, 5, e); g.fill(); g.restore();
+  const tg = g.createLinearGradient(0, 0, 0, S); tg.addColorStop(0, '#54313A'); tg.addColorStop(1, '#341D20');
+  g.fillStyle = tg; blob(0, 0, e); g.fill();
+  g.save(); blob(0, 0, e); g.clip();
+  g.strokeStyle = 'rgba(255,220,230,.14)'; g.lineWidth = 2; blob(0, 1, e - 1); g.stroke(); g.restore();
+  for (let i = 0; i < N * N; i++) {
+    if (!M[i]) continue;
+    const r = Math.floor(i / N), cc = i % N, x = pad + cc * cs + 2, y = pad + r * cs + 2, w = cs - 4;
+    const cg = g.createLinearGradient(0, y, 0, y + w);
+    if ((r + cc) % 2) { cg.addColorStop(0, '#462A2F'); cg.addColorStop(1, '#63404A'); } else { cg.addColorStop(0, '#3E2328'); cg.addColorStop(1, '#583740'); }
+    g.fillStyle = cg; rrect(g, x, y, w, w, cs * .2); g.fill();
+    g.save(); rrect(g, x, y, w, w, cs * .2); g.clip();
+    const ig = g.createLinearGradient(0, y, 0, y + w * .35); ig.addColorStop(0, 'rgba(0,0,0,.35)'); ig.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = ig; g.fillRect(x, y, w, w * .35); g.restore();
+  }
+  return c;
+}
 let lastT = 0;
 function render(now) {
   requestAnimationFrame(render);
@@ -1305,10 +1375,10 @@ function render(now) {
   g.clearRect(0, 0, S, S);
   g.save();
   if (fx.shake > .3) { g.translate((Math.random() - .5) * fx.shake, (Math.random() - .5) * fx.shake); fx.shake *= Math.pow(.02, dt); } else fx.shake = 0;
-  g.fillStyle = '#3B2224'; rrect(g, 0, 0, S, S, S * .045); g.fill();
+  if (!boardBg) boardBg = drawTray();
+  g.drawImage(boardBg, 0, 0, S, S);
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
     const x = pad + c * cs, y = pad + r * cs, i = r * N + c;
-    g.fillStyle = (r + c) % 2 ? '#5A363B' : '#4E2D32'; rrect(g, x + 1.5, y + 1.5, cs - 3, cs - 3, cs * .18); g.fill();
     if (G[i] > 0) {
       g.fillStyle = G[i] > 1 ? '#F7C6D7' : 'rgba(251,214,228,.62)';
       rrect(g, x + 3, y + 3, cs - 6, cs - 6, cs * .2); g.fill();
@@ -1326,7 +1396,7 @@ function render(now) {
     const x = pad + (selected % N) * cs, y = pad + Math.floor(selected / N) * cs;
     g.strokeStyle = '#FFE08A'; g.lineWidth = 3; rrect(g, x + 2.5, y + 2.5, cs - 5, cs - 5, cs * .2); g.stroke();
   }
-  g.save(); rrect(g, pad, pad, cs * N, cs * N, cs * .18); g.clip();
+  g.save(); g.beginPath(); for (let i = 0; i < N * N; i++) if (M[i]) g.rect(pad + (i % N) * cs - 1, pad + Math.floor(i / N) * cs - cs * .12, cs + 2, cs * 1.12 + 1); g.clip();
   for (let i = 0; i < N * N; i++) {
     const p = B[i]; if (!p) continue;
     const spr = sprite(p.t, p.sp);

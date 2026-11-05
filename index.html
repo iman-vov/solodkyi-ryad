@@ -269,7 +269,7 @@ body.hw h1{text-shadow:0 3px 0 #4A1F6B, 0 6px 0 #160B22}
 <script>
 (() => {
 'use strict';
-const N = 8, TAU = Math.PI * 2, LEVELS = 150;
+const N = 8, TAU = Math.PI * 2, LEVELS = 200;
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const SP = reduce ? 0.55 : 1;
 const $ = s => document.querySelector(s);
@@ -289,7 +289,7 @@ const TOOLS = { helper: 3, spoon: 2, mix: 1 };
 /* ---------- languages ---------- */
 const I18N = {
   uk: {
-    langName: "Українська", title: "Солодкий ряд", tagline: "Маленька пекарня на розі. 150 замовлень, кожне трохи складніше за попереднє.",
+    langName: "Українська", title: "Солодкий ряд", tagline: "Маленька пекарня на розі. 200 замовлень, кожне трохи складніше за попереднє.",
     start: "Почати", cont: "Продовжити · рівень {n}", replay: "Зіграти рівень {n} ще раз",
     modesAria: "Режим гри", modes: { moves: "Ходи", calm: "Спокійно", time: "На час" },
     hints: { moves: "Класика: обмежена кількість ходів.", calm: "Без обмежень. Програти неможливо, зірки за економні ходи.", time: "Ходів скільки завгодно, але тікає годинник." },
@@ -299,7 +299,7 @@ const I18N = {
     board: "Ігрове поле",
     types: ["Макаруни", "Пончики", "Вишеньки", "М’ятні цукерки", "Чорничні кекси", "Лимонні зірочки"],
     glaze: "Глазур", glazeLong: "Рожева глазур на таці",
-    chapters: ["Відкриття пекарні", "Осінній ярмарок", "Шкільні свята", "Зимові вечори", "Різдвяний поспіх", "Валентинів день", "Великодні кошики", "Весільний сезон", "Літня тераса", "Королівський бал", "Карамельна фабрика", "Склад печива", "Бабусин погріб", "Нічний ярмарок", "Гранд-фінал"],
+    chapters: ["Відкриття пекарні", "Осінній ярмарок", "Шкільні свята", "Зимові вечори", "Різдвяний поспіх", "Валентинів день", "Великодні кошики", "Весільний сезон", "Літня тераса", "Королівський бал", "Карамельна фабрика", "Склад печива", "Бабусин погріб", "Нічний ярмарок", "Гранд-фінал", "Метеликовий сад", "Кондитерський цех", "Шоколадна ріка", "Карусель", "Зоряний бенкет"],
     customers: [["Пані Оксана", "Святкує день народження доньки"], ["Дідусь Петро", "Чекає онуків на недільний чай"], ["Маленька Софійка", "Влаштовує ляльковий бал"], ["Сусідка Галина", "Кличе подруг на каву"], ["Пан Андрій", "Хоче здивувати дружину"], ["Тітонька Ліда", "Готує хрестини племінника"], ["Вчителька Марія", "Свято для 4-Б класу"], ["Бабуся Ніна", "Онуки приїжджають на канікули"], ["Студент Тарас", "Сесія, потрібна сила духу"], ["Квіткарка Ірина", "Відкриває нову крамничку"], ["Пан Богдан", "Ювілей фірми, двадцять років"], ["Остап і Христя", "Солодкий стіл на весілля"], ["Лікарка Віра", "Пригостити нічну зміну"], ["Маестро Левко", "Прем’єра в оперному театрі"], ["Команда «Сокіл»", "Святкує перемогу в чемпіонаті"]],
     cheers: ["", "", "Смачно!", "Смакота!", "Пальчики оближеш!", "Шеф-кондитер!"],
     combo: "Комбо ×{n}", fxBoom: "Солодкий вибух!", fxStorm: "Трюфельний шторм!", fxTruffle: "Трюфель!", fxWrap2: "Подвійний бантик!", fxWrapLine: "Солодкий хрест!", fxCross: "Хрест-навхрест!",
@@ -323,12 +323,16 @@ const I18N = {
     glazeH: "Туман", glazeLongH: "Фіолетовий туман на таці",
     lock: "Карамельні клітки", lockH: "Павутиння", box: "Коробки печива", boxH: "Старі скрині", ing: "Банки варення", ingH: "Кришталеві кулі",
     cheersH: ["", "", "Моторошно смачно!", "Чари!", "Відьомська магія!", "Король гарбузів!"], fxIng: "Доставлено!",
+    choc: "Шоколадні плитки", chocH: "Зелений слиз", chocS: "Шоколад", chocSH: "Слиз",
+    ruleFly: "Новинка: квадрат 2×2 з однакових солодощів створює метелика. Він сам летить до клітинки, яка найбільше заважає, і прибирає її.",
+    ruleBelt: "Конвеєрні стрічки після кожного ходу зсувають свій ряд на одну клітинку за стрілками. Те, що виїжджає з краю, з’являється з іншого боку.",
+    ruleChoc: "{choc} розростається: якщо за хід не зламати жодного шматочка, поруч з’явиться ще один. Ламайте рядами по сусідству та спецсолодощами.",
     ruleLock: "Солодощі в клітці ({lock}) не можна рухати. Зберіть із ними ряд або влучте спецсолодкою, щоб звільнити.",
     ruleBox: "{box} не рухаються і не складаються в ряди. Збирайте ряди поруч із ними або влучайте спецсолодощами. Деякі міцніші й потребують двох ударів.",
     ruleIng: "{ing} треба спустити на самий низ таці. Звільняйте місце під ними або міняйте їх із сусідами, якщо так виходить ряд.",
   },
   ru: {
-    langName: "Русский", title: "Сладкий ряд", tagline: "Маленькая пекарня на углу. 150 заказов, каждый чуть сложнее предыдущего.",
+    langName: "Русский", title: "Сладкий ряд", tagline: "Маленькая пекарня на углу. 200 заказов, каждый чуть сложнее предыдущего.",
     start: "Начать", cont: "Продолжить · уровень {n}", replay: "Сыграть уровень {n} ещё раз",
     modesAria: "Режим игры", modes: { moves: "Ходы", calm: "Спокойно", time: "На время" },
     hints: { moves: "Классика: ограниченное число ходов.", calm: "Без ограничений. Проиграть нельзя, звёзды за экономные ходы.", time: "Ходов сколько угодно, но тикают часы." },
@@ -338,7 +342,7 @@ const I18N = {
     board: "Игровое поле",
     types: ["Макаруны", "Пончики", "Вишенки", "Мятные конфеты", "Черничные кексы", "Лимонные звёздочки"],
     glaze: "Глазурь", glazeLong: "Розовая глазурь на подносе",
-    chapters: ["Открытие пекарни", "Осенняя ярмарка", "Школьные праздники", "Зимние вечера", "Рождественская суета", "День святого Валентина", "Пасхальные корзинки", "Свадебный сезон", "Летняя терраса", "Королевский бал", "Карамельная фабрика", "Склад печенья", "Бабушкин погреб", "Ночная ярмарка", "Гранд-финал"],
+    chapters: ["Открытие пекарни", "Осенняя ярмарка", "Школьные праздники", "Зимние вечера", "Рождественская суета", "День святого Валентина", "Пасхальные корзинки", "Свадебный сезон", "Летняя терраса", "Королевский бал", "Карамельная фабрика", "Склад печенья", "Бабушкин погреб", "Ночная ярмарка", "Гранд-финал", "Сад бабочек", "Кондитерский цех", "Шоколадная река", "Карусель", "Звёздный пир"],
     customers: [["Оксана Сергеевна", "Празднует день рождения дочки"], ["Дедушка Пётр", "Ждёт внуков на воскресный чай"], ["Маленькая Софийка", "Устраивает кукольный бал"], ["Соседка Галина", "Зовёт подруг на кофе"], ["Андрей", "Хочет удивить жену"], ["Тётя Лида", "Готовит крестины племянника"], ["Учительница Мария", "Праздник для 4-Б класса"], ["Бабушка Нина", "Внуки приезжают на каникулы"], ["Студент Тарас", "Сессия, нужна сила духа"], ["Цветочница Ирина", "Открывает новый магазинчик"], ["Богдан Иванович", "Юбилей фирмы, двадцать лет"], ["Остап и Христя", "Сладкий стол на свадьбу"], ["Доктор Вера", "Угостить ночную смену"], ["Маэстро Левко", "Премьера в оперном театре"], ["Команда «Сокол»", "Празднует победу в чемпионате"]],
     cheers: ["", "", "Вкусно!", "Объедение!", "Пальчики оближешь!", "Шеф-кондитер!"],
     combo: "Комбо ×{n}", fxBoom: "Сладкий взрыв!", fxStorm: "Трюфельный шторм!", fxTruffle: "Трюфель!", fxWrap2: "Двойной бантик!", fxWrapLine: "Сладкий крест!", fxCross: "Крест-накрест!",
@@ -362,12 +366,16 @@ const I18N = {
     glazeH: "Туман", glazeLongH: "Фиолетовый туман на подносе",
     lock: "Карамельные клетки", lockH: "Паутина", box: "Коробки печенья", boxH: "Старые сундуки", ing: "Банки варенья", ingH: "Хрустальные шары",
     cheersH: ["", "", "Жутко вкусно!", "Колдовство!", "Ведьмина магия!", "Тыквенный король!"], fxIng: "Доставлено!",
+    choc: "Шоколадные плитки", chocH: "Зелёная слизь", chocS: "Шоколад", chocSH: "Слизь",
+    ruleFly: "Новинка: квадрат 2×2 из одинаковых сладостей создаёт бабочку. Она сама летит к клетке, которая больше всего мешает, и убирает её.",
+    ruleBelt: "Конвейерные ленты после каждого хода сдвигают свой ряд на одну клетку по стрелкам. То, что уезжает за край, появляется с другой стороны.",
+    ruleChoc: "{choc} разрастается: если за ход не разбить ни кусочка, рядом появится ещё один. Разбивайте рядами по соседству и спецсладостями.",
     ruleLock: "Сладости в клетке ({lock}) нельзя двигать. Соберите с ними ряд или попадите спецсладостью, чтобы освободить.",
     ruleBox: "{box} не двигаются и не собираются в ряды. Собирайте ряды рядом с ними или бейте спецсладостями. Некоторые прочнее и требуют двух ударов.",
     ruleIng: "{ing} нужно опустить на самый низ подноса. Освобождайте место под ними или меняйте их с соседями, если получается ряд.",
   },
   de: {
-    langName: "Deutsch", title: "Süße Reihe", tagline: "Eine kleine Bäckerei an der Ecke. 150 Bestellungen, jede etwas kniffliger als die letzte.",
+    langName: "Deutsch", title: "Süße Reihe", tagline: "Eine kleine Bäckerei an der Ecke. 200 Bestellungen, jede etwas kniffliger als die letzte.",
     start: "Los geht’s", cont: "Weiter · Level {n}", replay: "Level {n} nochmal spielen",
     modesAria: "Spielmodus", modes: { moves: "Züge", calm: "Entspannt", time: "Auf Zeit" },
     hints: { moves: "Klassisch: begrenzte Anzahl an Zügen.", calm: "Ohne Limit. Verlieren unmöglich, Sterne für sparsame Züge.", time: "Unbegrenzt Züge, aber die Uhr tickt." },
@@ -377,7 +385,7 @@ const I18N = {
     board: "Spielfeld",
     types: ["Macarons", "Donuts", "Kirschen", "Minzbonbons", "Blaubeer-Cupcakes", "Zitronensterne"],
     glaze: "Glasur", glazeLong: "Rosa Glasur auf dem Blech",
-    chapters: ["Eröffnung der Bäckerei", "Herbstmarkt", "Schulfeste", "Winterabende", "Weihnachtstrubel", "Valentinstag", "Osterkörbchen", "Hochzeitssaison", "Sommerterrasse", "Königlicher Ball", "Karamellfabrik", "Keksspeicher", "Omas Vorratskeller", "Nachtmarkt", "Großes Finale"],
+    chapters: ["Eröffnung der Bäckerei", "Herbstmarkt", "Schulfeste", "Winterabende", "Weihnachtstrubel", "Valentinstag", "Osterkörbchen", "Hochzeitssaison", "Sommerterrasse", "Königlicher Ball", "Karamellfabrik", "Keksspeicher", "Omas Vorratskeller", "Nachtmarkt", "Großes Finale", "Schmetterlingsgarten", "Konditorei-Werkstatt", "Schokoladenfluss", "Karussell", "Sternenbankett"],
     customers: [["Frau Oksana", "Feiert den Geburtstag ihrer Tochter"], ["Opa Petro", "Erwartet die Enkel zum Sonntagstee"], ["Die kleine Sofia", "Veranstaltet einen Puppenball"], ["Nachbarin Halyna", "Lädt Freundinnen zum Kaffee ein"], ["Herr Andrij", "Will seine Frau überraschen"], ["Tante Lida", "Bereitet die Taufe ihres Neffen vor"], ["Lehrerin Maria", "Fest für die Klasse 4b"], ["Oma Nina", "Die Enkel kommen in den Ferien"], ["Student Taras", "Prüfungszeit, Nervennahrung nötig"], ["Floristin Iryna", "Eröffnet ihren neuen Laden"], ["Herr Bohdan", "Firmenjubiläum, zwanzig Jahre"], ["Ostap und Chrystja", "Süßes Buffet für die Hochzeit"], ["Ärztin Wira", "Für die ganze Nachtschicht"], ["Maestro Lewko", "Premiere in der Oper"], ["Team „Falke“", "Feiert den Meistertitel"]],
     cheers: ["", "", "Lecker!", "Köstlich!", "Zum Fingerlecken!", "Meisterkonditor!"],
     combo: "Kombo ×{n}", fxBoom: "Süße Explosion!", fxStorm: "Trüffelsturm!", fxTruffle: "Trüffel!", fxWrap2: "Doppelschleife!", fxWrapLine: "Süßes Kreuz!", fxCross: "Kreuz und quer!",
@@ -401,12 +409,16 @@ const I18N = {
     glazeH: "Nebel", glazeLongH: "Lila Nebel auf dem Blech",
     lock: "Karamellkäfige", lockH: "Spinnennetze", box: "Keksdosen", boxH: "Alte Truhen", ing: "Marmeladengläser", ingH: "Kristallkugeln",
     cheersH: ["", "", "Schaurig lecker!", "Hexerei!", "Hexenzauber!", "Kürbiskönig!"], fxIng: "Geliefert!",
+    choc: "Schokoladenstücke", chocH: "Grüner Schleim", chocS: "Schokolade", chocSH: "Schleim",
+    ruleFly: "Neu: Ein 2×2-Quadrat aus gleichen Süßigkeiten ergibt einen Schmetterling. Er fliegt zu dem Feld, das am meisten stört, und räumt es ab.",
+    ruleBelt: "Förderbänder schieben ihre Reihe nach jedem Zug um ein Feld in Pfeilrichtung. Was am Rand hinausfährt, kommt auf der anderen Seite wieder herein.",
+    ruleChoc: "{choc} breitet sich aus: Wenn du in einem Zug kein Stück zerstörst, wächst nebenan ein neues. Bilde Reihen direkt daneben oder nutze Spezial-Süßigkeiten.",
     ruleLock: "Gefangene Süßigkeiten ({lock}) lassen sich nicht bewegen. Bilde eine Reihe mit ihnen oder triff sie mit einer Spezial-Süßigkeit, um sie zu befreien.",
     ruleBox: "{box} bewegen sich nicht und zählen nicht für Reihen. Bilde Reihen direkt daneben oder triff sie mit Spezial-Süßigkeiten. Manche sind stabiler und brauchen zwei Treffer.",
     ruleIng: "{ing} müssen ganz nach unten aufs Blech. Räume den Platz darunter frei oder tausche sie mit Nachbarn, wenn dabei eine Reihe entsteht.",
   },
   en: {
-    langName: "English", title: "Sweet Row", tagline: "A little bakery on the corner. 150 orders, each a bit trickier than the last.",
+    langName: "English", title: "Sweet Row", tagline: "A little bakery on the corner. 200 orders, each a bit trickier than the last.",
     start: "Start", cont: "Continue · level {n}", replay: "Play level {n} again",
     modesAria: "Game mode", modes: { moves: "Moves", calm: "Relaxed", time: "Timed" },
     hints: { moves: "Classic: a limited number of moves.", calm: "No limits. You can’t lose; stars reward fewer moves.", time: "Unlimited moves, but the clock is ticking." },
@@ -416,7 +428,7 @@ const I18N = {
     board: "Game board",
     types: ["Macarons", "Doughnuts", "Cherries", "Mint candies", "Blueberry cupcakes", "Lemon stars"],
     glaze: "Icing", glazeLong: "Pink icing on the tray",
-    chapters: ["Grand Opening", "Autumn Fair", "School Parties", "Winter Evenings", "Christmas Rush", "Valentine’s Day", "Easter Baskets", "Wedding Season", "Summer Terrace", "The Royal Ball", "Caramel Factory", "Cookie Warehouse", "Grandma’s Pantry", "Night Market", "Grand Finale"],
+    chapters: ["Grand Opening", "Autumn Fair", "School Parties", "Winter Evenings", "Christmas Rush", "Valentine’s Day", "Easter Baskets", "Wedding Season", "Summer Terrace", "The Royal Ball", "Caramel Factory", "Cookie Warehouse", "Grandma’s Pantry", "Night Market", "Grand Finale", "Butterfly Garden", "Pastry Workshop", "Chocolate River", "Carousel", "Starlight Feast"],
     customers: [["Mrs. Oksana", "Celebrating her daughter’s birthday"], ["Grandpa Petro", "Expecting the grandkids for Sunday tea"], ["Little Sofia", "Throwing a ball for her dolls"], ["Neighbour Halyna", "Having friends over for coffee"], ["Mr. Andriy", "Wants to surprise his wife"], ["Aunt Lida", "Planning her nephew’s christening"], ["Ms. Maria, the teacher", "A party for class 4B"], ["Grandma Nina", "The grandkids are coming for the holidays"], ["Taras the student", "Exam week, needs a sugar boost"], ["Iryna the florist", "Opening her new little shop"], ["Mr. Bohdan", "The company turns twenty"], ["Ostap and Khrystia", "A sweet table for the wedding"], ["Dr. Vira", "Treats for the whole night shift"], ["Maestro Levko", "Opening night at the opera"], ["The Falcons", "Celebrating the championship"]],
     cheers: ["", "", "Tasty!", "Delicious!", "Finger-licking good!", "Master pastry chef!"],
     combo: "Combo ×{n}", fxBoom: "Sweet explosion!", fxStorm: "Truffle storm!", fxTruffle: "Truffle!", fxWrap2: "Double bow!", fxWrapLine: "Sweet cross!", fxCross: "Criss-cross!",
@@ -440,6 +452,10 @@ const I18N = {
     glazeH: "Fog", glazeLongH: "Purple fog on the tray",
     lock: "Caramel cages", lockH: "Cobwebs", box: "Cookie boxes", boxH: "Old chests", ing: "Jam jars", ingH: "Crystal balls",
     cheersH: ["", "", "Spooky tasty!", "Bewitching!", "Witchy magic!", "Pumpkin king!"], fxIng: "Delivered!",
+    choc: "Chocolate chunks", chocH: "Green slime", chocS: "Chocolate", chocSH: "Slime",
+    ruleFly: "New: a 2×2 square of the same sweet makes a butterfly. It flies to the square that’s most in the way and clears it.",
+    ruleBelt: "Conveyor belts shift their row one square in the arrow’s direction after every move. Whatever slides off one end comes back in at the other.",
+    ruleChoc: "{choc} spreads: if you don’t break any piece during a move, a new one grows next to it. Make matches right beside it or use specials.",
     ruleLock: "Trapped sweets ({lock}) can’t be moved. Match them or hit them with a special sweet to set them free.",
     ruleBox: "{box} don’t move and can’t be matched. Make matches right next to them or hit them with specials. Some are tougher and need two hits.",
     ruleIng: "{ing} need to reach the very bottom of the tray. Clear the space below them, or swap them with a neighbour when that makes a match.",
@@ -530,6 +546,8 @@ const sfx = (() => {
     pop(c) { const f = 470 * Math.pow(2, (Math.min(c, 8) - 1) * 2 / 12); tone(f, .14, 'sine', .14, 0, 1.6); tone(f * 1.5, .1, 'triangle', .04, .03); },
     special() { tone(660, .12, 'triangle', .09, 0, 1.5); tone(990, .16, 'sine', .07, .06); },
     zap() { tone(1100, .22, 'sawtooth', .025, 0, .35); },
+    belt() { tone(200, .12, 'triangle', .05, 0, 1.25); tone(260, .1, 'triangle', .04, .1, 1.2); },
+    flutter() { tone(880, .08, 'triangle', .05, 0, 1.4); tone(1175, .08, 'triangle', .04, .07, 1.3); tone(1480, .1, 'sine', .04, .14, 1.2); },
     crack() { tone(330, .09, 'square', .05, 0, .6); tone(520, .07, 'triangle', .05, .04, .7); },
     boom() { tone(170, .3, 'triangle', .16, 0, .45); },
     win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, .28, 'triangle', .11, i * .12)); },
@@ -568,6 +586,7 @@ function drawPiece(g, t, sp, cx, cy, S) {
   else switch (t) {
     case -2: drawBox(g, R, sp); break;
     case -3: drawIng(g, R); break;
+    case -4: drawChoc(g, R); break;
     case 0: { // макарун
       const main = '#F48FB1', dark = '#D2457F';
       g.fillStyle = dark; ell(g, 0, R * .4, R * .9, R * .4);
@@ -658,8 +677,41 @@ function drawPiece(g, t, sp, cx, cy, S) {
     g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = R * .05; g.stroke();
     g.fillStyle = bow; ell(g, -R * .24, -R * .98, R * .22, R * .13, .45); ell(g, R * .24, -R * .98, R * .22, R * .13, -.45);
     g.fillStyle = '#C98A06'; circ(g, 0, -R * .98, R * .1);
+  } else if (sp === 'f') {
+    drawButterfly(g, R * .5, -R * .5, R * 1.15, 0);
   }
   g.restore();
+}
+/* Butterfly (bakery) or moth (Halloween); flap 0..1 squeezes the wings */
+function drawButterfly(g, x, y, R, flap) {
+  const hw = SKIN === 'hw', c1 = hw ? '#8E5CC9' : '#FF6FA5', c2 = hw ? '#FF8A1F' : '#6FCBFF', sq = 1 - .55 * flap;
+  g.save(); g.translate(x, y); g.rotate(-.35);
+  g.strokeStyle = '#FFFFFF'; g.lineWidth = R * .05;
+  g.fillStyle = c1; for (const s of [-1, 1]) { g.beginPath(); g.ellipse(s * R * .22 * sq, -R * .12, R * .24 * sq, R * .17, s * -.5, 0, TAU); g.fill(); g.stroke(); }
+  g.fillStyle = c2; for (const s of [-1, 1]) { g.beginPath(); g.ellipse(s * R * .16 * sq, R * .13, R * .16 * sq, R * .12, s * .5, 0, TAU); g.fill(); g.stroke(); }
+  g.fillStyle = '#3B2224'; rrect(g, -R * .045, -R * .26, R * .09, R * .48, R * .045); g.fill();
+  g.strokeStyle = '#3B2224'; g.lineWidth = R * .03; g.beginPath(); g.moveTo(0, -R * .24); g.lineTo(-R * .1, -R * .38); g.moveTo(0, -R * .24); g.lineTo(R * .1, -R * .38); g.stroke();
+  g.restore();
+}
+/* Spreading blocker: chocolate bar chunk, or a green slime at Halloween */
+function drawChoc(g, R) {
+  if (SKIN === 'hw') {
+    g.fillStyle = '#2E8B3A'; g.beginPath();
+    for (let k = 0; k <= 40; k++) { const a = k / 40 * TAU, r = R * (.82 + .07 * Math.sin(a * 5) + (Math.sin(a) > .3 ? .08 * Math.sin(a * 9) : 0)); const x = Math.cos(a) * r, y = Math.sin(a) * r * .92 + R * .06; k ? g.lineTo(x, y) : g.moveTo(x, y); }
+    g.closePath(); g.fill();
+    g.fillStyle = '#5BD15B'; ell(g, 0, -R * .04, R * .72, R * .64);
+    g.fillStyle = 'rgba(255,255,255,.5)'; ell(g, -R * .3, -R * .36, R * .18, R * .08, -.5);
+    g.fillStyle = '#FFFFFF'; circ(g, -R * .22, -R * .02, R * .15); circ(g, R * .22, -R * .02, R * .15);
+    g.fillStyle = '#1A1024'; circ(g, -R * .19, 0, R * .07); circ(g, R * .25, 0, R * .07);
+    g.strokeStyle = '#1F6B2A'; g.lineWidth = R * .06; g.beginPath(); g.arc(0, R * .22, R * .14, .2, Math.PI - .2); g.stroke();
+  } else {
+    g.fillStyle = '#3E2216'; rrect(g, -R * .9, -R * .86, R * 1.8, R * 1.8, R * .2); g.fill();
+    g.fillStyle = '#5A3420'; rrect(g, -R * .9, -R * .9, R * 1.8, R * 1.76, R * .2); g.fill();
+    for (const x of [-.8, .04]) for (const y of [-.8, .04]) {
+      g.fillStyle = '#7A4A2E'; rrect(g, x * R, y * R, R * .76, R * .74, R * .1); g.fill();
+      g.fillStyle = '#9C6542'; rrect(g, x * R + R * .06, y * R + R * .06, R * .64, R * .14, R * .06); g.fill();
+    }
+  }
 }
 
 function tri(g, a, b, c) { g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.lineTo(c[0], c[1]); g.closePath(); g.fill(); }
@@ -854,6 +906,7 @@ function iconCanvas(t, css = 30) {
   else if (t === 'l') renderPiece(g, 0, null, ...at, 1);
   else if (t === 'x') renderPiece(g, -2, 'x2', ...at);
   else if (t === 'i') renderPiece(g, -3, null, ...at);
+  else if (t === 'c') renderPiece(g, -4, null, ...at);
   else renderPiece(g, +t, null, ...at);
   return c;
 }
@@ -912,7 +965,13 @@ function mechFor(n) {
   if (ch === 11) return 'x';
   if (ch === 12) return 'i';
   if (ch === 13) return ['lx', 'xi', 'li', 'l', 'x', 'lx', 'i', 'xi', 'li', 'lx'][k];
-  return ['lx', 'xi', 'lxi', 'li', 'x', 'lxi', 'xi', 'li', 'lx', 'lxi'][k];
+  if (ch === 14) return ['lx', 'xi', 'lxi', 'li', 'x', 'lxi', 'xi', 'li', 'lx', 'lxi'][k];
+  // 151-200: butterflies are always on; b = conveyor belts, c = spreading chocolate
+  if (ch === 15) return ['', 'l', 'x', 'i', '', 'lx', 'x', 'l', 'i', 'xi'][k];
+  if (ch === 16) return ['b', 'b', 'bl', 'bx', 'b', 'bi', 'bl', 'bx', 'bi', 'blx'][k];
+  if (ch === 17) return ['c', 'c', 'cl', 'c', 'c', 'cx', 'cl', 'ci', 'cx', 'cl'][k];
+  if (ch === 18) return ['bc', 'bc', 'bcl', 'bcx', 'c', 'bci', 'bcl', 'bcx', 'bc', 'bcl'][k];
+  return ['bcl', 'bcx', 'lxi', 'bci', 'b', 'bcx', 'bcl', 'cxi', 'bci', 'bcl'][k];
 }
 function makeLevel(n) {
   const rng = mulberry32(n * 7919 + 13);
@@ -922,16 +981,17 @@ function makeLevel(n) {
   const shapeIdx = shaped ? (n * 3 + Math.floor(rng() * 4)) % SHAPES.length : -1;
   const mask = shaped ? SHAPES[shapeIdx].join('').split('').map(ch => ch === '#') : FULL;
   const cells = mask.filter(Boolean).length;
-  const types = (n <= 8 || n % 7 === 0 || breather) ? 5 : 6;
-  const mech = mechFor(n), mechN = mech.length;
+  const types = (n <= 8 || (n % 7 === 0 && n <= 150) || breather) ? 5 : 6;
+  const mech = mechFor(n), mechN = mech.replace('b', '').length, belts = mech.includes('b');
   const glazeOn = n >= 4 && n % 3 === 1 && mechN <= 1;
   const layers = glazeOn && n >= 20 && n % 2 === 0 ? 2 : 1;
   const kinds = n <= 2 ? 1 : n <= 12 ? 2 : 3;
   const pieceKinds = Math.max(1, kinds - (glazeOn ? 1 : 0) - mechN);
-  const moves = Math.max(18, 25 - Math.floor(n / 7)) + (glazeOn ? 3 + (layers - 1) * 4 : 0) + (kinds === 3 ? 2 : 0) + mechN * 5 + (mech.includes('i') ? 4 : 0);
+  const moves0 = Math.max(18, 25 - Math.floor(n / 7)) + (glazeOn ? 3 + (layers - 1) * 4 : 0) + (kinds === 3 ? 2 : 0) + mechN * 5 + (mech.includes('i') ? 4 : 0) + (mech.includes('c') ? 2 : 0);
+  const moves = n > 150 ? Math.max(14, Math.round(moves0 * (.73 - (n - 151) * .002))) : moves0;
   const diff = (.5 + .4 * Math.min(1, (n - 1) / 90)) * (breather ? .8 : 1);
-  const expected = moves * 5.2 / types;
-  const per = Math.max(8, Math.round(expected * diff * (pieceKinds === 3 ? .85 : 1) * (glazeOn ? .75 : 1) * Math.sqrt(cells / 64) * (mechN >= 2 ? .66 : mechN ? .78 : 1) * (mech.includes('i') ? .88 : 1)));
+  const expected = moves0 * 5.2 / types;
+  const per = Math.max(8, Math.round(expected * diff * (pieceKinds === 3 ? .85 : 1) * (glazeOn ? .75 : 1) * Math.sqrt(cells / 64) * (mechN >= 2 ? .66 : mechN ? .78 : 1) * (mech.includes('i') ? .88 : 1) * (n > 150 ? 1.08 + (n - 151) * .004 : 1) * (belts ? 1.45 : 1)));
   const pool = shuffleArr([...Array(types).keys()], rng).slice(0, pieceKinds);
   const orders = pool.map(t => ({ t, need: per + Math.floor(rng() * 3) - 1 }));
   const glaze = new Array(N * N).fill(0);
@@ -940,7 +1000,7 @@ function makeLevel(n) {
     for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (pat(r, c) && mask[r * N + c]) { glaze[r * N + c] = layers; sum += layers; }
     orders.push({ t: 'g', need: sum });
   }
-  const lockCells = [], boxCells = [], ingCells = []; let ingN = 0;
+  const lockCells = [], boxCells = [], ingCells = [], chocCells = [], beltRows = []; let ingN = 0;
   if (mech) {
     const ch = Math.floor((n - 1) / 10), k = (n - 1) % 10, taken = new Set(), playable = [];
     for (let i = 0; i < N * N; i++) if (mask[i]) playable.push(i);
@@ -960,27 +1020,47 @@ function makeLevel(n) {
     if (lockCells.length) orders.push({ t: 'l', need: lockCells.length });
     if (boxCells.length) orders.push({ t: 'x', need: boxCells.length });
     if (ingN) orders.push({ t: 'i', need: ingN });
+    if (mech.includes('c')) {
+      const cnt = Math.min(Math.floor(playable.length * .14), ch === 17 ? 4 + Math.floor(k / 3) : 4 + (k % 3));
+      chocCells.push(...pick(cnt, i => Math.floor(i / N) >= 4));
+      if (chocCells.length) orders.push({ t: 'c', need: chocCells.length });
+    }
+    if (belts) {
+      const rowLen = r => { let c = 0; for (let q = 0; q < N; q++) if (mask[r * N + q]) c++; return c; };
+      const two = ch >= 18 ? k % 2 === 1 : k >= 5;
+      const dir = rng() < .5 ? 1 : -1;
+      const want = two ? [[2, dir], [5, -dir]] : [[rng() < .5 ? 3 : 4, dir]];
+      for (const [r0, d] of want) {
+        let r = r0; for (const dr of [0, 1, -1, 2, -2]) if (r0 + dr >= 1 && r0 + dr < N - 1 && rowLen(r0 + dr) >= 5 && !beltRows.some(b => b.r === r0 + dr)) { r = r0 + dr; break; }
+        if (rowLen(r) >= 4) beltRows.push({ r, dir: d });
+      }
+    }
   }
   const cust = (n - 1) % 15;
-  return { n, types, moves, time: moves * 5, orders: orders.filter(o => o.need > 0), glaze, cust, mask, lockCells, boxCells, ingCells, ingN };
+  return { n, types, moves, time: moves * 5, orders: orders.filter(o => o.need > 0), glaze, cust, mask, lockCells, boxCells, ingCells, ingN, chocCells, belts: beltRows, sq: n > 150, choc: chocCells.length > 0 };
 }
 
 /* ---------- state ---------- */
 let L = null, B = [], G = [], M = FULL, boardBg = null, moves = 0, used = 0, timeLeft = 0, mode = 'moves', score = 0, orders = [];
 let busy = false, playing = false, selected = -1, hint = null, lastAct = 0, extraCount = 0, uid = 1;
-let tools = { ...TOOLS }, spoonMode = false, spawnedIng = 0;
+let tools = { ...TOOLS }, spoonMode = false, spawnedIng = 0, chocHit = false;
 const fx = { parts: [], beams: [], texts: [], shake: 0, flash: 0 };
 function newPiece(t, sp, r, c) { return { t, sp: sp || null, r, c, dr: r, dc: c, s: 1, a: 1, id: uid++ }; }
 const typeAt = i => { const p = B[i]; return p && p.t >= 0 ? p.t : -9; };
-const movable = p => p && p.t !== -2 && !p.lock;          // boxes and caged sweets stay put
+const isBlock = p => p && (p.t === -2 || p.t === -4);      // boxes and chocolate take hits instead of popping
+const movable = p => p && !isBlock(p) && !p.lock;          // boxes and caged sweets stay put
 function nbrs(i) { const r = Math.floor(i / N), c = i % N, o = []; if (r > 0) o.push(i - N); if (r < N - 1) o.push(i + N); if (c > 0) o.push(i - 1); if (c < N - 1) o.push(i + 1); return o; }
 function randomColor() { const ts = []; for (const q of B) if (q && q.t >= 0) ts.push(q.t); return ts.length ? ts[rnd(ts.length)] : 0; }
 
 /* ---------- matching ---------- */
-function findGroups() {
+function findGroups(squares = true) {   // squares only count for the player's own move, not for chain reactions
   const runs = [];
   for (let r = 0; r < N; r++) { let c = 0; while (c < N) { const t = typeAt(r * N + c); let e = c + 1; if (t >= 0) while (e < N && typeAt(r * N + e) === t) e++; if (t >= 0 && e - c >= 3) { const cells = []; for (let k = c; k < e; k++) cells.push(r * N + k); runs.push({ dir: 'h', cells }); } c = t >= 0 ? e : c + 1; } }
   for (let c = 0; c < N; c++) { let r = 0; while (r < N) { const t = typeAt(r * N + c); let e = r + 1; if (t >= 0) while (e < N && typeAt(e * N + c) === t) e++; if (t >= 0 && e - r >= 3) { const cells = []; for (let k = r; k < e; k++) cells.push(k * N + c); runs.push({ dir: 'v', cells }); } r = t >= 0 ? e : r + 1; } }
+  if (squares && L && L.sq) for (let r = 0; r < N - 1; r++) for (let c = 0; c < N - 1; c++) {
+    const i = r * N + c, t = typeAt(i);
+    if (t >= 0 && typeAt(i + 1) === t && typeAt(i + N) === t && typeAt(i + N + 1) === t) runs.push({ dir: 'q', cells: [i, i + 1, i + N, i + N + 1] });
+  }
   const cellG = new Map(), groups = [];
   for (const run of runs) {
     let target = null;
@@ -997,10 +1077,12 @@ function findGroups() {
   return groups.filter(g => !g.dead);
 }
 function specialFor(g, prefer) {
-  const maxLen = Math.max(...g.runs.map(r => r.cells.length));
-  const hasH = g.runs.some(r => r.dir === 'h'), hasV = g.runs.some(r => r.dir === 'v');
+  const lines = g.runs.filter(r => r.dir !== 'q');
+  const maxLen = lines.length ? Math.max(...lines.map(r => r.cells.length)) : 0;
+  const hasH = lines.some(r => r.dir === 'h'), hasV = lines.some(r => r.dir === 'v');
   let sp = null;
-  if (maxLen >= 5) sp = 'b'; else if (hasH && hasV) sp = 'w'; else if (maxLen === 4) sp = g.runs[0].dir === 'h' ? 'v' : 'h';
+  if (maxLen >= 5) sp = 'b'; else if (hasH && hasV) sp = 'w'; else if (maxLen === 4) sp = lines.find(r => r.cells.length === 4).dir === 'h' ? 'v' : 'h';
+  else if (lines.length < g.runs.length) sp = 'f';
   if (!sp) return null;
   const t = typeAt(g.runs[0].cells[0]);
   let pos = null;
@@ -1019,7 +1101,12 @@ function lineAt(i) {
   for (let k = c + 1; k < N && typeAt(r * N + k) === t; k++) h++;
   for (let k = r - 1; k >= 0 && typeAt(k * N + c) === t; k--) v++;
   for (let k = r + 1; k < N && typeAt(k * N + c) === t; k++) v++;
-  return h >= 3 || v >= 3;
+  if (h >= 3 || v >= 3) return true;
+  if (L && L.sq) for (const [dr, dc] of [[0, 0], [0, -1], [-1, 0], [-1, -1]]) {
+    const rr = r + dr, cc = c + dc; if (rr < 0 || cc < 0 || rr >= N - 1 || cc >= N - 1) continue;
+    const k = rr * N + cc; if ([k, k + 1, k + N, k + N + 1].every(q => typeAt(q) === t)) return true;
+  }
+  return false;
 }
 function findMove() {
   for (let i = 0; i < N * N; i++) {
@@ -1052,7 +1139,7 @@ function bestMove() {
           for (const k of g.cells) {
             if (B[k].sp) sc += 10; if (wants.has(B[k].t)) sc += 3; if (G[k] > 0 && wants.has('g')) sc += 4;
             if (B[k].lock && wants.has('l')) sc += 6;
-            if (wants.has('x')) for (const q of nbrs(k)) if (B[q] && B[q].t === -2) sc += 5;
+            for (const q of nbrs(k)) if (B[q] && ((B[q].t === -2 && wants.has('x')) || (B[q].t === -4 && wants.has('c')))) sc += 5;
             if (wants.has('i')) for (let up = k - N; up >= 0; up -= N) if (B[up] && B[up].t === -3) { sc += 12; break; }
           }
         }
@@ -1069,15 +1156,16 @@ function bestMove() {
 
 /* ---------- board setup ---------- */
 function fillBoard() {
-  const boxAt = new Map(L.boxCells), ingAt = new Set(L.ingCells);
+  const boxAt = new Map(L.boxCells), ingAt = new Set(L.ingCells), chocAt = new Set(L.chocCells);
   for (let tries = 0; tries < 300; tries++) {
     B = new Array(N * N).fill(null);
     for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
       const i = r * N + c; if (!M[i]) continue;
       if (boxAt.has(i)) { const p = newPiece(-2, null, r, c); p.hp = boxAt.get(i); B[i] = p; continue; }
       if (ingAt.has(i)) { B[i] = newPiece(-3, null, r, c); continue; }
+      if (chocAt.has(i)) { const p = newPiece(-4, null, r, c); p.hp = 1; B[i] = p; continue; }
       let t, guard = 0;
-      do { t = rnd(L.types); } while (guard++ < 30 && ((c >= 2 && B[i - 1]?.t === t && B[i - 2]?.t === t) || (r >= 2 && B[i - N]?.t === t && B[i - 2 * N]?.t === t)));
+      do { t = rnd(L.types); } while (guard++ < 30 && ((c >= 2 && B[i - 1]?.t === t && B[i - 2]?.t === t) || (r >= 2 && B[i - N]?.t === t && B[i - 2 * N]?.t === t) || (L.sq && r >= 1 && c >= 1 && B[i - 1]?.t === t && B[i - N]?.t === t && B[i - N - 1]?.t === t)));
       B[i] = newPiece(t, null, r, c);
     }
     for (const i of L.lockCells) if (B[i] && B[i].t >= 0) B[i].lock = 1;
@@ -1088,7 +1176,7 @@ function fillBoard() {
 /* ---------- effects ---------- */
 function centerOf(i) { return [pad + (i % N + .5) * cs, pad + (Math.floor(i / N) + .5) * cs]; }
 function burst(p) {
-  const x = pad + (p.dc + .5) * cs, y = pad + (p.dr + .5) * cs, col = p.t >= 0 ? SK.colors[p.t] : p.t === -2 ? SK.box : '#8D6E63';
+  const x = pad + (p.dc + .5) * cs, y = pad + (p.dr + .5) * cs, col = p.t >= 0 ? SK.colors[p.t] : p.t === -2 ? SK.box : p.t === -4 ? (SKIN === 'hw' ? '#5BD15B' : '#7A4A2E') : '#8D6E63';
   const n = reduce ? 3 : 7;
   for (let k = 0; k < n; k++) { const a = Math.random() * TAU, v = (80 + Math.random() * 180) * (cs / 45); fx.parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 80, life: 0, max: .5 + Math.random() * .3, col: k % 3 ? col : '#FFFFFF', size: cs * (.05 + Math.random() * .05) }); }
 }
@@ -1120,7 +1208,23 @@ function effect(i, p) {
     if (present.length) { const t = present[rnd(present.length)]; for (let j = 0; j < N * N; j++) if (B[j] && B[j].t === t) { out.push(j); fx.beams.push({ k: 'link', from: i, to: j, life: 0, max: .4 }); } }
     fx.beams.push({ k: 'ring', r, c, life: 0, max: .5, rad: 3 }); sfx.boom();
   }
+  else if (p.sp === 'f') { out.push(i); const t = flyTarget(i); out.push(t); fx.beams.push({ k: 'fly', from: i, to: t, life: 0, max: .42 }); sfx.flutter(); }
   return out;
+}
+/* Where a butterfly goes: the most useful cell for the current order */
+function flyTarget(from) {
+  const want = new Set(orders.filter(o => o.got < o.need).map(o => o.t)), cands = [];
+  for (let i = 0; i < N * N; i++) {
+    const p = B[i]; if (!p || i === from || p.t === -3) continue;
+    let w = 0;
+    if (p.t === -2 && want.has('x')) w = 6; else if (p.t === -4 && want.has('c')) w = 7; else if (p.lock && want.has('l')) w = 5;
+    else if (G[i] > 0 && want.has('g')) w = 4; else if (want.has(p.t)) w = 1;
+    if (want.has('i')) for (let up = i - N; up >= 0; up -= N) if (B[up] && B[up].t === -3) { w = Math.max(w, 5); break; }
+    cands.push([w + Math.random() * .9, i]);
+  }
+  if (!cands.length) return from;
+  cands.sort((a, b) => b[0] - a[0]);
+  return cands[0][1];
 }
 
 function countOrder(t) { for (const o of orders) if (o.t === t && o.got < o.need) { o.got++; break; } }
@@ -1135,10 +1239,10 @@ async function clearCells(set, creates = [], cascade = 1, skip = new Set()) {
   for (const i of all) {
     const p = B[i];
     if (p.t === -3) continue;
-    if (p.t === -2) { hits.add(i); continue; }
+    if (isBlock(p)) { hits.add(i); continue; }
     if (p.lock) unlock.push(i); else pop.push(i);
   }
-  for (const i of [...pop, ...unlock]) for (const q of nbrs(i)) if (B[q] && B[q].t === -2) hits.add(q);
+  for (const i of [...pop, ...unlock]) for (const q of nbrs(i)) if (isBlock(B[q])) hits.add(q);
   const touched = [...pop, ...unlock, ...hits];
   if (!touched.length) return;
   let sx = 0, sy = 0;
@@ -1158,7 +1262,7 @@ async function clearCells(set, creates = [], cascade = 1, skip = new Set()) {
   for (const i of unlock) { const p = B[i]; p.lock = 0; p.s = 1; countOrder('l'); if (G[i] > 0) { G[i]--; countOrder('g'); } }
   for (const i of hits) {
     const p = B[i]; p.dc = p.c; p.s = 1; p.hp--;
-    if (p.hp <= 0) { B[i] = null; countOrder('x'); if (G[i] > 0) { G[i]--; countOrder('g'); } for (let k = 0; k < 2; k++) burst(p); }
+    if (p.hp <= 0) { B[i] = null; if (p.t === -4) { countOrder('c'); chocHit = true; } else countOrder('x'); if (G[i] > 0) { G[i]--; countOrder('g'); } for (let k = 0; k < 2; k++) burst(p); }
   }
   for (const cr of creates) { if (B[cr.pos]) continue; const np = newPiece(cr.t, cr.sp, Math.floor(cr.pos / N), cr.pos % N); np.s = .2; B[cr.pos] = np; }
   if (creates.length) { sfx.special(); await tween(160 * SP, k => { for (const cr of creates) { const p = B[cr.pos]; if (p) p.s = .2 + .8 * easeOutBack(k); } }); }
@@ -1211,7 +1315,7 @@ async function cascadeLoop(prefer) {
   let cascade = 0;
   for (;;) {
     if (await collectIngredients()) { await gravity(); continue; }
-    const groups = findGroups(); if (!groups.length) break;
+    const groups = findGroups(cascade === 0 && !!prefer); if (!groups.length) break;
     cascade++;
     const set = new Set(), creates = [];
     for (const g of groups) { g.cells.forEach(i => set.add(i)); const s = specialFor(g, prefer); if (s) creates.push(s); }
@@ -1241,7 +1345,7 @@ async function comboBomb(a, b) {
     const targets = []; for (let i = 0; i < N * N; i++) if (B[i] && B[i].t === col) targets.push(i);
     for (const i of targets) fx.beams.push({ k: 'link', from: bombPos, to: i, life: 0, max: .45 });
     if (other.sp) {
-      for (const i of targets) if (!B[i].sp && !B[i].lock) B[i].sp = other.sp === 'w' ? 'w' : (Math.random() < .5 ? 'h' : 'v');
+      for (const i of targets) if (!B[i].sp && !B[i].lock) B[i].sp = other.sp === 'w' || other.sp === 'f' ? other.sp : (Math.random() < .5 ? 'h' : 'v');
       sfx.special();
       await tween(320 * SP, k => { for (const i of targets) if (B[i]) B[i].s = 1 + .18 * Math.sin(k * Math.PI); });
     }
@@ -1253,6 +1357,13 @@ async function comboBomb(a, b) {
 }
 async function comboSpecials(a, b) {
   const kinds = [B[a].sp, B[b].sp], r = Math.floor(b / N), c = b % N;
+  if (kinds.includes('f')) {   // butterflies take the other special with them: two flights each, the other one fires too
+    const set = new Set([a, b]), skip = new Set();
+    for (const pos of [a, b]) if (B[pos].sp === 'f') { skip.add(pos); for (let k = 0; k < 2; k++) { const t = flyTarget(pos); set.add(t); fx.beams.push({ k: 'fly', from: pos, to: t, life: 0, max: .45 + k * .1 }); } }
+    sfx.flutter(); floatText(T('combo', { n: 2 }), 3.5, 3.0, true); shake(4); confetti(20, ...centerOf(b));
+    await clearCells(set, [], 1, skip); await gravity(); await cascadeLoop();
+    return;
+  }
   const set = new Set([a, b]), skip = new Set([a, b]);
   const W = kinds.filter(k => k === 'w').length;
   const addRow = rr => { if (rr < 0 || rr >= N) return; for (let k = 0; k < N; k++) set.add(rr * N + k); fx.beams.push({ k: 'h', r: rr, c, life: 0, max: .4 }); };
@@ -1281,6 +1392,36 @@ async function shuffleBoard() {
   if (!findMove() && all.length) { const p = all.find(q => !q.sp) || all[0]; p.t = -1; p.sp = 'b'; sfx.special(); }
 }
 
+/* ---------- conveyor belts & chocolate ---------- */
+async function moveBelts() {
+  const moving = [];
+  for (const { r, dir } of L.belts) {
+    const cols = []; for (let c = 0; c < N; c++) if (M[r * N + c]) cols.push(c);
+    const ps = cols.map(c => B[r * N + c]), n = cols.length;
+    ps.forEach((p, k) => {
+      const to = (k + dir + n) % n, tc = cols[to];
+      B[r * N + tc] = p;
+      if (p) { const wrap = (dir > 0 && to === 0) || (dir < 0 && to === n - 1); moving.push({ p, from: wrap ? tc - dir : p.c, to: tc }); p.c = tc; }
+    });
+  }
+  if (!moving.length) return;
+  sfx.belt();
+  await tween(300 * SP, k => { const e = easeInOut(k); for (const m of moving) m.p.dc = m.from + (m.to - m.from) * e; });
+  for (const m of moving) m.p.dc = m.p.c;
+}
+async function spreadChoc() {
+  let cellsN = 0; const chocs = [];
+  for (let i = 0; i < N * N; i++) { if (M[i]) cellsN++; if (B[i] && B[i].t === -4) chocs.push(i); }
+  if (!chocs.length || chocs.length >= cellsN * .35) return;
+  const opts = [];
+  for (const i of chocs) for (const q of nbrs(i)) { const p = B[q]; if (p && p.t >= 0 && !p.sp && !p.lock) opts.push(q); }
+  if (!opts.length) return;
+  const q = opts[rnd(opts.length)], np = newPiece(-4, null, Math.floor(q / N), q % N);
+  np.hp = 1; np.s = .3; B[q] = np; sfx.crack();
+  await tween(280 * SP, k => { np.s = .3 + .7 * easeOutBack(k); });
+  np.s = 1;
+}
+
 /* ---------- turn flow ---------- */
 function useMove() { used++; if (mode === 'moves') moves--; updateHud(); }
 const ordersDone = () => orders.every(o => o.got >= o.need);
@@ -1293,7 +1434,7 @@ async function trySwap(a, b) {
     tween(280 * SP, k => { q.dc = q.c + Math.sin(k * Math.PI * 4) * .08 * (1 - k); }).then(() => { q.dc = q.c; });
     return;
   }
-  busy = true; selected = -1; hint = null;
+  busy = true; selected = -1; hint = null; chocHit = false;
   try {
     const pa = B[a], pb = B[b];
     sfx.swap();
@@ -1306,9 +1447,11 @@ async function trySwap(a, b) {
   } finally { busy = false; lastAct = performance.now(); }
 }
 
-async function afterTurn() {
+async function afterTurn(real = true) {
   updateHud();
   if (ordersDone()) { await winSequence(); return; }
+  if (real && L.belts.length) { await moveBelts(); await cascadeLoop(); updateHud(); if (ordersDone()) { await winSequence(); return; } }
+  if (real && L.choc) { if (!chocHit) await spreadChoc(); chocHit = false; }
   if (mode === 'moves' && moves <= 0) { playing = false; sfx.lose(); noteFail(); showLose(); return; }
   if (mode === 'time' && timeLeft <= 0) { playing = false; sfx.lose(); noteFail(); showLose(); return; }
   if (!findMove()) await shuffleBoard();
@@ -1370,14 +1513,14 @@ async function useSpoon(i) {
   try {
     shake(3);
     await clearCells(new Set([i]), [], 1); await gravity(); await cascadeLoop();
-    await afterTurn();
+    await afterTurn(false);
   } finally { busy = false; lastAct = performance.now(); updateHud(); }
 }
 async function useMix() {
   if (busy || !playing || tools.mix <= 0) return;
   tools.mix--; spoonMode = false; selected = -1; updateHud();
   busy = true; hint = null;
-  try { await shuffleBoard(); await cascadeLoop(); await afterTurn(); }
+  try { await shuffleBoard(); await cascadeLoop(); await afterTurn(false); }
   finally { busy = false; lastAct = performance.now(); updateHud(); }
 }
 
@@ -1438,6 +1581,7 @@ function needName(t) {
   if (t === 'l') return hwOr('lock', 'lockH');
   if (t === 'x') return hwOr('box', 'boxH');
   if (t === 'i') return hwOr('ing', 'ingH');
+  if (t === 'c') return hwOr('choc', 'chocH');
   return hwOr('types', 'typesH')[t];
 }
 function needList(withProgress) {
@@ -1456,6 +1600,9 @@ function rulesFor(n) {
   if (n === 101) return `<p class="rules">${T('ruleLock', { lock: lang === 'de' ? needName('l') : needName('l').toLowerCase() })}</p>`;
   if (n === 111) return `<p class="rules">${T('ruleBox', { box: needName('x') })}</p>`;
   if (n === 121) return `<p class="rules">${T('ruleIng', { ing: needName('i') })}</p>`;
+  if (n === 151) return `<p class="rules">${T('ruleFly')}</p>`;
+  if (n === 161) return `<p class="rules">${T('ruleBelt')}</p>`;
+  if (n === 171) return `<p class="rules">${T('ruleChoc', { choc: hwOr('chocS', 'chocSH') })}</p>`;
   return '';
 }
 function showIntro() {
@@ -1494,8 +1641,8 @@ function showLose() {
     <p>${T('waiting', { name: D.customers[L.cust][0] })}</p>
     ${needList(true)}
     <div class="actions">
-      <button class="btn" data-act="extra">${mode === 'time' ? T('extraTime') : T('extraMoves')}</button>
-      <button class="btn ghost" data-act="retry">${T('restart')}</button>
+      ${extraCount ? '' : `<button class="btn" data-act="extra">${mode === 'time' ? T('extraTime') : T('extraMoves')}</button>`}
+      <button class="btn ${extraCount ? '' : 'ghost'}" data-act="retry">${T('restart')}</button>
       <button class="btn ghost" data-act="map">${T('toMap')}</button>
     </div>`);
 }
@@ -1517,7 +1664,7 @@ ov.addEventListener('click', e => {
   else if (act === 'retry') { hideOverlay(); startLevel(L.n); }
   else if (act === 'map') { hideOverlay(); playing = false; showMap(); }
   else if (act === 'stay') { hideOverlay(); }
-  else if (act === 'extra') { extraCount++; if (mode === 'time') timeLeft += 30; else moves += 5; tools.helper += 1; playing = true; hideOverlay(); updateHud(); lastAct = performance.now(); }
+  else if (act === 'extra') { if (extraCount) return; extraCount++; if (mode === 'time') timeLeft += 30; else moves += 5; tools.helper += 1; playing = true; hideOverlay(); updateHud(); lastAct = performance.now(); }
 });
 
 /* ---------- screens ---------- */
@@ -1733,6 +1880,19 @@ function render(now) {
       circ(g, x + cs * .3, y + cs - 4, cs * .07); circ(g, x + cs * .68, y + cs - 3, cs * .09);
     }
   }
+  for (const { r, dir } of L.belts || []) {
+    const y = pad + r * cs;
+    g.save(); g.beginPath(); for (let c = 0; c < N; c++) if (M[r * N + c]) g.rect(pad + c * cs + 2, y + 2, cs - 4, cs - 4); g.clip();
+    const hwB = SKIN === 'hw';
+    g.fillStyle = hwB ? 'rgba(255,138,31,.2)' : 'rgba(255,214,120,.22)'; g.fillRect(pad, y, cs * N, cs);
+    g.strokeStyle = hwB ? 'rgba(255,170,80,.9)' : 'rgba(255,226,150,.95)'; g.lineWidth = Math.max(2, cs * .055); g.lineCap = 'round'; g.lineJoin = 'round';
+    const off = ((now / 700) % 1) * cs * .5 * dir, a = cs * .06;
+    for (const ey of [y + cs * .1, y + cs * .9]) for (let x = pad - cs; x < pad + cs * (N + 1); x += cs * .5) {
+      const cx = x + off;
+      g.beginPath(); g.moveTo(cx - dir * a, ey - a); g.lineTo(cx + dir * a, ey); g.lineTo(cx - dir * a, ey + a); g.stroke();
+    }
+    g.restore();
+  }
   if (playing && !busy && !hint && now - lastAct > 6000) hint = findMove();
   if (hint) {
     g.fillStyle = `rgba(255,236,170,${.18 + .16 * Math.sin(now / 180)})`;
@@ -1768,6 +1928,11 @@ function render(now) {
       const [x, y] = [pad + (b.c + .5) * cs, pad + (b.r + .5) * cs];
       g.strokeStyle = `rgba(255,236,170,${al})`; g.lineWidth = cs * .22 * al + 1;
       g.beginPath(); g.arc(x, y, cs * (.4 + b.rad * u), 0, TAU); g.stroke();
+    } else if (b.k === 'fly') {
+      const [x1, y1] = centerOf(b.from), [x2, y2] = centerOf(b.to), e = Math.min(1, u * 1.25);
+      const mx = (x1 + x2) / 2, my = Math.min(y1, y2) - cs * 1.6, q = 1 - e;
+      const bx = q * q * x1 + 2 * q * e * mx + e * e * x2, by = q * q * y1 + 2 * q * e * my + e * e * y2;
+      g.globalAlpha = 1; drawButterfly(g, bx, by, cs * .55, (Math.sin(now / 40) + 1) / 2);
     } else if (b.k === 'link') {
       const [x1, y1] = centerOf(b.from), [x2, y2] = centerOf(b.to);
       g.strokeStyle = `rgba(255,250,235,${al * .9})`; g.lineWidth = 3; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
